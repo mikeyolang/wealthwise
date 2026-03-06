@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthwise/core/app_theme.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -153,12 +154,16 @@ class _FinancialPersonalityQuizState extends State<FinancialPersonalityQuiz> {
     ),
   ];
 
-  void _answerQuestion(int index) {
+  void _answerQuestion(int index) async {
     if (_currentQuestionIndex < _questions.length - 1) {
       setState(() => _currentQuestionIndex++);
     } else {
-      // Finish quiz and go to dashboard
-      context.go('/dashboard');
+      // Mark onboarding as complete
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboarding_complete', true);
+      
+      // Finish quiz and go to login
+      if (mounted) context.go('/login');
     }
   }
 

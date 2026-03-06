@@ -9,8 +9,6 @@ class TransactionModel {
   final String? merchantName;
   final String paymentMethod;
   final String? notes;
-  final String? receiptImagePath;
-  final String? receiptFirebaseUrl;
   final DateTime date;
   final bool isRecurring;
   final String? recurringFrequency;
@@ -27,8 +25,6 @@ class TransactionModel {
     this.merchantName,
     required this.paymentMethod,
     this.notes,
-    this.receiptImagePath,
-    this.receiptFirebaseUrl,
     required this.date,
     required this.isRecurring,
     this.recurringFrequency,
@@ -47,8 +43,6 @@ class TransactionModel {
       'merchantName': merchantName,
       'paymentMethod': paymentMethod,
       'notes': notes,
-      'receiptImagePath': receiptImagePath,
-      'receiptFirebaseUrl': receiptFirebaseUrl,
       'date': date.millisecondsSinceEpoch,
       'isRecurring': isRecurring ? 1 : 0,
       'recurringFrequency': recurringFrequency,
@@ -68,8 +62,6 @@ class TransactionModel {
       merchantName: map['merchantName'],
       paymentMethod: map['paymentMethod'],
       notes: map['notes'],
-      receiptImagePath: map['receiptImagePath'],
-      receiptFirebaseUrl: map['receiptFirebaseUrl'],
       date: DateTime.fromMillisecondsSinceEpoch(map['date']),
       isRecurring: map['isRecurring'] == 1,
       recurringFrequency: map['recurringFrequency'],

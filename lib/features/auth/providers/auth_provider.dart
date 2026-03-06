@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:wealthwise/features/auth/auth_repository.dart';
 import 'package:wealthwise/features/auth/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
@@ -47,6 +48,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final user = await _repository.signIn(email: email, password: password);
       _ref.read(currentUserProvider.notifier).state = user;
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final user = await _repository.signInWithGoogle();
+      if (user != null) {
+        _ref.read(currentUserProvider.notifier).state = user;
+      }
       state = state.copyWith(isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

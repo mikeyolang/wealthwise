@@ -46,6 +46,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  void _handleGoogleSignIn() async {
+    await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+    
+    final authState = ref.read(authNotifierProvider);
+    if (authState.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authState.error!)),
+      );
+    } else {
+      context.go('/dashboard');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
@@ -139,8 +152,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                 ),
               ),
-              
+
               const SizedBox(height: 24),
+              
+              Row(
+                children: [
+                   Expanded(child: Divider(color: AppTheme.textSecondary.withOpacity(0.3))),
+                   const Padding(
+                     padding: EdgeInsets.symmetric(horizontal: 16),
+                     child: Text('OR', style: TextStyle(color: AppTheme.textSecondary)),
+                   ),
+                   Expanded(child: Divider(color: AppTheme.textSecondary.withOpacity(0.3))),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              // Google Login Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton.icon(
+                  onPressed: authState.isLoading ? null : _handleGoogleSignIn,
+                  icon: Image.network(
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
+                    height: 24,
+                  ),
+                  label: const Text('Continue with Google'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: BorderSide(color: AppTheme.textSecondary.withOpacity(0.3)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 32),
               
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -160,6 +207,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                 ],
+              ),
+              
+              const SizedBox(height: 48),
+              
+              Center(
+                child: TextButton(
+                  onPressed: () => context.go('/dashboard'),
+                  child: const Text(
+                    'Continue as Guest',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

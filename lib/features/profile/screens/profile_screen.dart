@@ -13,6 +13,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
     final transactionsAsync = ref.watch(transactionsStreamProvider);
+    final isGuest = user == null;
 
     return Scaffold(
       backgroundColor: AppTheme.primaryNavy,
@@ -25,13 +26,19 @@ class ProfileScreen extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            _buildProfileHeader(user?.name ?? 'User', user?.email ?? 'user@example.com'),
+            _buildProfileHeader(
+              user?.name ?? 'Guest User', 
+              user?.email ?? 'Sign in to sync your data',
+              isGuest,
+            ),
             const SizedBox(height: 40),
             _buildSettingsSection(context, ref),
             const SizedBox(height: 24),
-            _buildDataSection(context, ref, transactionsAsync, user?.name ?? 'User'),
-            const SizedBox(height: 40),
-            _buildLogoutButton(context, ref),
+            if (!isGuest) ...[
+              _buildDataSection(context, ref, transactionsAsync, user?.name ?? 'User'),
+              const SizedBox(height: 40),
+            ],
+            _buildAuthButton(context, ref, isGuest),
             const SizedBox(height: 100),
           ],
         ),
@@ -39,18 +46,25 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(String name, String email) {
+  Widget _buildProfileHeader(String name, String email, bool isGuest) {
     return Column(
       children: [
         Stack(
           children: [
             Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(color: AppTheme.accentEmerald, shape: BoxShape.circle),
-              child: const CircleAvatar(
+              decoration: BoxDecoration(
+                color: isGuest ? AppTheme.accentGold : AppTheme.accentEmerald, 
+                shape: BoxShape.circle
+              ),
+              child: CircleAvatar(
                 radius: 50,
                 backgroundColor: AppTheme.secondaryNavy,
-                child: Icon(Icons.person, size: 60, color: AppTheme.accentEmerald),
+                child: Icon(
+                  isGuest ? Icons.person_outline : Icons.person, 
+                  size: 60, 
+                  color: isGuest ? AppTheme.accentGold : AppTheme.accentEmerald
+                ),
               ),
             ),
           ],
@@ -103,24 +117,35 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
+  Widget _buildAuthButton(BuildContext context, WidgetRef ref, bool isGuest) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SizedBox(
         width: double.infinity,
         height: 56,
-        child: OutlinedButton.icon(
-          onPressed: () {
-             ref.read(authNotifierProvider.notifier).signOut();
-             context.go('/login');
-          },
-          icon: const Icon(Icons.logout_rounded, color: AppTheme.accentCoral),
-          label: const Text('Sign Out', style: TextStyle(color: AppTheme.accentCoral, fontWeight: FontWeight.bold)),
-          style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: AppTheme.accentCoral),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        ),
+        child: isGuest
+            ? ElevatedButton(
+                onPressed: () => context.go('/login'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.accentEmerald,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                child: const Text('Sign In / Register', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              )
+            : OutlinedButton.icon(
+                onPressed: () {
+                   ref.read(authNotifierProvider.notifier).signOut();
+                   context.go('/login');
+                },
+                icon: const Icon(Icons.logout_rounded, color: AppTheme.accentCoral),
+                label: const Text('Sign Out', style: TextStyle(color: AppTheme.accentCoral, fontWeight: FontWeight.bold)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppTheme.accentCoral),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
       ),
     );
   }

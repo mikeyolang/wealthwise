@@ -6,7 +6,8 @@ class BiometricService {
 
   Future<bool> isBiometricAvailable() async {
     final bool canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
-    final bool canAuthenticate = canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
+    final bool canAuthenticate =
+        canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
     return canAuthenticate;
   }
 
@@ -18,10 +19,7 @@ class BiometricService {
     try {
       final bool didAuthenticate = await _auth.authenticate(
         localizedReason: 'Please authenticate to access Wealthwise',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: false,
-        ),
+        biometricOnly: false,
       );
       return didAuthenticate;
     } on PlatformException catch (e) {

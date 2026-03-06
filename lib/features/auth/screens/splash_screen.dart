@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wealthwise/core/app_theme.dart';
 import 'package:wealthwise/features/auth/providers/auth_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -13,23 +14,43 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  bool _timerFinished = false;
+
   @override
   void initState() {
     super.initState();
-    _checkAuth();
+    _startTimer();
   }
 
-  Future<void> _checkAuth() async {
+  Future<void> _startTimer() async {
     await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
+    if (mounted) {
+      setState(() {
+        _timerFinished = true;
+      });
+      _checkAndNavigate();
+    }
+  }
+
+  void _checkAndNavigate() async {
+    if (!_timerFinished) return;
 
     final authState = ref.read(authStateProvider);
     authState.when(
-      data: (user) {
+      data: (user) async {
         if (user != null) {
           context.go('/dashboard');
         } else {
-          context.go('/onboarding');
+          final prefs = await SharedPreferences.getInstance();
+          final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+          
+          if (mounted) {
+            if (onboardingComplete) {
+              context.go('/login');
+            } else {
+              context.go('/onboarding');
+            }
+          }
         }
       },
       loading: () {},
@@ -39,6 +60,31 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen for auth state changes
+    ref.listen(authStateProvider, (previous, next) async {
+      if (_timerFinished) {
+        next.when(
+          data: (user) async {
+            if (user != null) {
+              context.go('/dashboard');
+            } else {
+              final prefs = await SharedPreferences.getInstance();
+              final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+              if (mounted) {
+                if (onboardingComplete) {
+                  context.go('/login');
+                } else {
+                  context.go('/onboarding');
+                }
+              }
+            }
+          },
+          loading: () {},
+          error: (_, __) => context.go('/login'),
+        );
+      }
+    });
+
     return Scaffold(
       backgroundColor: AppTheme.primaryNavy,
       body: Center(

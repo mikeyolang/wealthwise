@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:csv/csv.dart';
+import 'package:csv/csv.dart'; // Ensure this is version ^7.0.0
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
@@ -9,7 +9,16 @@ import 'package:share_plus/share_plus.dart';
 class DataExportService {
   Future<void> exportToCSV(List<TransactionModel> transactions) async {
     List<List<dynamic>> rows = [];
-    rows.add(['ID', 'Date', 'Type', 'Category', 'Merchant', 'Amount (Cents)', 'Payment Method', 'Notes']);
+    rows.add([
+      'ID',
+      'Date',
+      'Type',
+      'Category',
+      'Merchant',
+      'Amount (Cents)',
+      'Payment Method',
+      'Notes'
+    ]);
 
     for (var tx in transactions) {
       rows.add([
@@ -24,14 +33,17 @@ class DataExportService {
       ]);
     }
 
-    String csv = const ListToCsvConverter().convert(rows);
+    String csvString = csv.encode(rows);
+
     final directory = await getTemporaryDirectory();
     final file = File('${directory.path}/wealthwise_export.csv');
-    await file.writeAsString(csv);
-    await Share.shareXFiles([XFile(file.path)], text: 'My Wealthwise Transactions');
+    await file.writeAsString(csvString);
+    await Share.shareXFiles([XFile(file.path)],
+        text: 'My Wealthwise Transactions');
   }
 
-  Future<void> exportToPDF(List<TransactionModel> transactions, String userName) async {
+  Future<void> exportToPDF(
+      List<TransactionModel> transactions, String userName) async {
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -40,19 +52,23 @@ class DataExportService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('Wealthwise Financial Report', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+              pw.Text('Wealthwise Financial Report',
+                  style: pw.TextStyle(
+                      fontSize: 24, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 10),
               pw.Text('Report for: $userName'),
               pw.Text('Generated on: ${DateTime.now().toLocal()}'),
               pw.SizedBox(height: 20),
               pw.TableHelper.fromTextArray(
                 headers: ['Date', 'Category', 'Merchant', 'Amount'],
-                data: transactions.map((tx) => [
-                  tx.date.toString().substring(0, 10),
-                  tx.category,
-                  tx.merchantName ?? '-',
-                  '${(tx.amount / 100).toStringAsFixed(2)}'
-                ]).toList(),
+                data: transactions
+                    .map((tx) => [
+                          tx.date.toString().substring(0, 10),
+                          tx.category,
+                          tx.merchantName ?? '-',
+                          ((tx.amount / 100).toStringAsFixed(2))
+                        ])
+                    .toList(),
               ),
             ],
           );
@@ -63,6 +79,7 @@ class DataExportService {
     final directory = await getTemporaryDirectory();
     final file = File('${directory.path}/wealthwise_report.pdf');
     await file.writeAsBytes(await pdf.save());
-    await Share.shareXFiles([XFile(file.path)], text: 'My Wealthwise Financial Report');
+    await Share.shareXFiles([XFile(file.path)],
+        text: 'My Wealthwise Financial Report');
   }
 }

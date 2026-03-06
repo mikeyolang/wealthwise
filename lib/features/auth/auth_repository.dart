@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:wealthwise/features/auth/user_model.dart';
 import 'package:wealthwise/services/database_helper.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth = firebase_auth.FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
   Stream<firebase_auth.User?> get authStateChanges => _firebaseAuth.authStateChanges();
@@ -75,7 +77,44 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
+    await _googleSignIn.signOut();
     await _firebaseAuth.signOut();
+  }
+
+  Future<UserModel?> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return null;
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final firebase_auth.AuthCredential credential = firebase_auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final firebase_auth.User? user = userCredential.user;
+
+      if (user == null) return null;
+
+      // Try to get user from local DB first
+      UserModel? localUser = await _getUserLocally(user.uid);
+      
+      if (localUser == null) {
+        localUser = UserModel(
+          id: user.uid,
+          name: user.displayName ?? 'User',
+          email: user.email ?? '',
+          currency: 'KES',
+          createdAt: DateTime.now(),
+        );
+        await _saveUserLocally(localUser);
+      }
+      
+      return localUser;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> _saveUserLocally(UserModel user) async {

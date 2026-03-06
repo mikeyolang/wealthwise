@@ -4,13 +4,30 @@ import 'package:wealthwise/core/app_theme.dart';
 import 'package:wealthwise/features/transactions/transaction_provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:intl/intl.dart';
+import 'package:wealthwise/core/widgets/guest_prompt.dart';
+import 'package:wealthwise/features/auth/providers/auth_provider.dart';
 
 class AnalyticsScreen extends ConsumerWidget {
   const AnalyticsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
+    if (user == null) {
+      return Scaffold(
+        backgroundColor: AppTheme.primaryNavy,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text('Financial Analytics', style: TextStyle(color: Colors.white)),
+        ),
+        body: const GuestPrompt(
+          title: 'Advanced Insights',
+          message: 'Sign in to access AI-powered financial reports and trend analysis for your spending.',
+          icon: Icons.analytics_rounded,
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: AppTheme.primaryNavy,
       appBar: AppBar(

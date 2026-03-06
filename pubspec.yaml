@@ -2,7 +2,7 @@ name: wealthwise
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.10.4
+  sdk: ">=3.3.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -33,62 +33,61 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # Firebase
-  firebase_core: ^3.11.0
-  firebase_auth: ^5.5.0
-  cloud_firestore: ^5.6.2
-  firebase_storage: ^12.4.2
+  firebase_core: ^4.5.0
+  firebase_auth: ^6.2.0
+  cloud_firestore: ^6.1.3
+  google_sign_in: ^6.2.2
 
   # Offline-First Local DB
   sqflite: ^2.4.1
   path: ^1.9.1
 
   # Sync & Connectivity
-  connectivity_plus: ^6.1.3
-  workmanager: ^0.5.2
+  connectivity_plus: ^7.0.0
+  workmanager: ^0.9.0
   uuid: ^4.5.1
 
   # AI
   google_generative_ai: ^0.4.5
 
   # Auth & Security
-  local_auth: ^2.3.0
-  flutter_secure_storage: ^9.2.4
+  local_auth: ^3.0.1
+  flutter_secure_storage: ^10.0.0
 
   # UI & Charts
-  fl_chart: ^0.70.2
+  fl_chart: ^1.1.1
   flutter_animate: ^4.5.2
   lottie: ^3.3.1
   percent_indicator: ^4.2.3
   shimmer: ^3.0.0
-  confetti: ^0.7.0
+  confetti: ^0.8.0
 
   # Notifications
-  awesome_notifications: ^0.10.1
+  awesome_notifications: ^0.11.0
 
   # Media
-  image_picker: ^1.1.2
-  cached_network_image: ^3.4.1
   path_provider: ^2.1.5
 
   # Utilities
   intl: ^0.20.2
-  go_router: ^14.8.0
-  google_fonts: ^6.2.1
-  share_plus: ^10.1.4
+  go_router: ^17.1.0
+  google_fonts: ^8.0.2
+  share_plus: ^12.0.1
   pdf: ^3.11.1
-  csv: ^6.0.0
+  csv: ^7.2.0
   rxdart: ^0.28.0
+  shared_preferences: ^2.5.1
 
   # State Management
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.3.6
+  flutter_riverpod: ^3.2.1
+  riverpod_annotation: ^4.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-  build_runner: ^2.4.15
-  riverpod_generator: ^2.4.4
+  flutter_lints: ^6.0.0
+  build_runner: ^2.12.2
+  riverpod_generator: ^4.0.3
 
 flutter:
   uses-material-design: true
@@ -97,4 +96,3 @@ flutter:
     - assets/animations/
     - assets/images/
     - assets/icons/
-

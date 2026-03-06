@@ -54,8 +54,6 @@ class DatabaseHelper {
         merchantName TEXT,
         paymentMethod $textType,
         notes TEXT,
-        receiptImagePath TEXT,
-        receiptFirebaseUrl TEXT,
         date $integerType,
         isRecurring $boolType,
         recurringFrequency TEXT,
