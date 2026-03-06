@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wealthwise/services/gemini_service.dart';
 
-final geminiServiceProvider = Provider<GeminiService>((ref) => GeminiService(apiKey: 'AIzaSyAharETbyUWa0K0UAjaRWY3kODT-DESeuk'));
+final geminiServiceProvider = Provider<GeminiService>((ref) => GeminiService(apiKey: ''));
 
 final dailyTipProvider = FutureProvider<String>((ref) async {
   return ref.watch(geminiServiceProvider).getDailyTip();
